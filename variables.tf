@@ -1,52 +1,74 @@
 // Place for module variables configuration
 variable "location" {
   description = "The Azure Region where the Windows Web App should exist. Changing this forces a new Windows Web App to be created."
-  type = string
-  default = "North Europe"
+  type        = string
+  default     = "North Europe"
 
 
-  validation {
-    error_message = local.metadata.validator_error_messages.allowed_locations
-    condition = contains(
-      local.metadata.validator_expressions.allowed_locations,
-      var.location
-    )
-  }
+validation {
+  error_message = local.metadata.validator_error_messages.location
+  condition = can(regex(local.metadata.validator_expressions.location, var.location))
+}
+
 }
 
 variable "name" {
-    description = " The name which should be used for this Windows Web App. Changing this forces a new Windows Web App to be created."
-    type = string
+  description = " The name which should be used for this Windows Web App. Changing this forces a new Windows Web App to be created."
+  type        = string
 
-    validation {
-    error_message = local.metadata.validator_error_messages.virtual_network_name
-    condition = can(
-      regex(
-        local.metadata.validator_expressions.virtual_network_name,
-        var.name
-      )
-    )
-  }
 }
 
 variable "resource_group_name" {
-    description = "The name of the Resource Group where the Windows Web App should exist. Changing this forces a new Windows Web App to be created."
-    type = string
+  description = "The name of the Resource Group where the Windows Web App should exist. Changing this forces a new Windows Web App to be created."
+  type        = string
 
-    validation {
-    error_message = local.metadata.validator_error_messages.resource_group_name
+}
+
+variable "os_type" {
+  type        = string
+  description = "The O/S type for the App Services to be hosted in this plan."
+  default     = "Windows"
+
+  validation {
+    error_message = local.metadata.validator_error_messages.os_type
     condition = can(
       regex(
-        local.metadata.validator_expressions.resource_group_name,
-        var.resource_group_name
+        local.metadata.validator_expressions.os_type,
+        var.os_type
       )
     )
   }
+
 }
 
+variable "sku_name" {
+
+  description = "Sku name of the Windows Web App"
+  type        = string
+
+  validation {
+    error_message = local.metadata.validator_error_messages.sku_name
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.sku_name,
+        var.sku_name
+      )
+    )
+  }
+
+}
+
+variable "app_service_environment_id" {
+  type        = string
+  description = "The ID of the App Service Environment to create this Service Plan in."
+  default     = null
+}
+
+
+
 variable "service_plan_id" {
-    description = "The ID of the Service Plan that this Windows App Service will be created in."
-    type = string
+  description = "The ID of the Service Plan that this Windows App Service will be created in."
+  type        = string
 }
 
 variable "site_config" {
@@ -163,7 +185,6 @@ variable "site_config" {
   api_definition_url                            = The URL to the API Definition for this Web App.
   api_management_api_id                         = The ID of the API Management API ID this Web App is associated with.
   app_command_line                              = The command line used to launch this app.
-  auto_heal_enabled                             = Are Auto heal rules be enabled.
   container_registry_managed_identity_client_id = The Client ID of the Managed Service Identity to use for connections to the Azure Container Registry.
   container_registry_use_managed_identity       = Do connections for Azure Container Registry use Managed Identity.
   default_documents                             = The list of Default Documents for the Web App.
@@ -266,11 +287,6 @@ variable "site_config" {
   }
 
   validation {
-    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_enabled)))
-    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_enabled", local.metadata.validator_error_messages["default"])
-  }
-
-  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.ftps_state", local.metadata.validator_expressions["default"]), tostring(var.site_config.ftps_state)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.ftps_state", local.metadata.validator_error_messages["default"])
   }
@@ -280,138 +296,152 @@ variable "site_config" {
     error_message = lookup(local.metadata.validator_error_messages, "site_config.health_check_eviction_time_in_min", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.http2_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.http2_enabled)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.http2_enabled", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.load_balancing_mode", local.metadata.validator_expressions["default"]), tostring(var.site_config.load_balancing_mode)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.load_balancing_mode", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.local_mysql_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.local_mysql_enabled)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.local_mysql_enabled", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.managed_pipeline_mode", local.metadata.validator_expressions["default"]), tostring(var.site_config.managed_pipeline_mode)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.managed_pipeline_mode", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.minimum_tls_version", local.metadata.validator_expressions["default"]), tostring(var.site_config.minimum_tls_version)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.alwaminimum_tls_versions_on", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.remote_debugging_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.remote_debugging_enabled)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.remote_debugging_enabled", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.remote_debugging_version", local.metadata.validator_expressions["default"]), tostring(var.site_config.remote_debugging_version)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.remote_debugging_version", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_minimum_tls_version", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_minimum_tls_version)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_minimum_tls_version", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_use_main_ip_restriction", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_use_main_ip_restriction)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_use_main_ip_restriction", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.use_32_bit_worker", local.metadata.validator_expressions["default"]), tostring(var.site_config.use_32_bit_worker)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.use_32_bit_worker", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.vnet_route_all_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.vnet_route_all_enabled)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.vnet_route_all_enabled", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.websockets_enabled", local.metadata.validator_expressions["default"]), tostring(var.site_config.websockets_enabled)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.websockets_enabled", local.metadata.validator_error_messages["default"])
   }
 
-    validation {
+  validation {
     condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.worker_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.worker_count)))
     error_message = lookup(local.metadata.validator_error_messages, "site_config.worker_count", local.metadata.validator_error_messages["default"])
   }
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_action_time", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.action.minimum_process_execution_time)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_action_time", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_action_time", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.action.minimum_process_execution_time)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_action_time", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_requests_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.requests.count)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_requests_count", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_requests_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.requests.interval)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_requests_interval", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.count)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_count", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.interval)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_interval", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_time_taken", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.time_taken)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_time_taken", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_status_code_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.status_code.count)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_status_code_count", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_status_code_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.status_code.interval)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_status_code_interval", local.metadata.validator_error_messages["default"])
+  }
 
 validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_requests_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.requests.count)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_requests_count", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_requests_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.requests.interval)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_requests_interval", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.count)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_count", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.interval)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_interval", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_slow_request_time_taken", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.slow_request.time_taken)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_slow_request_time_taken", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_status_code_count", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.status_code.count)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_status_code_count", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_status_code_interval", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.status_code.interval)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_status_code_interval", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.auto_heal_setting_trigger_status_code_range", local.metadata.validator_expressions["default"]), tostring(var.site_config.auto_heal_setting.trigger.status_code.status_code_range))) && (
-      tobool(length(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)) == 1 && tonumber(var.site_config.auto_heal_setting.trigger.status_code.status_code_range) >= 101 && tonumber(var.site_config.auto_heal_setting.trigger.status_code.status_code_range) <= 599) ||
-      tobool(length(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)) == 2 && tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[0]) >= 101 && tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[1]) <= 599 && tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[0]) < tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[1]))
+  condition = try(
+    var.site_config.auto_heal_setting == null ||
+    (
+      (length(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)) == 1 &&
+       tonumber(var.site_config.auto_heal_setting.trigger.status_code.status_code_range) >= 101 &&
+       tonumber(var.site_config.auto_heal_setting.trigger.status_code.status_code_range) <= 599)
+      ||
+      (length(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)) == 2 &&
+       tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[0]) >= 101 &&
+       tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[1]) <= 599 &&
+       tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[0]) <
+       tonumber(split("-", var.site_config.auto_heal_setting.trigger.status_code.status_code_range)[1])
+      )
+    ),
+    true
   )
   error_message = lookup(local.metadata.validator_error_messages, "site_config.auto_heal_setting_trigger_status_code_range", local.metadata.validator_error_messages["default"])
 }
 
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.ip_restriction_action", local.metadata.validator_expressions["default"]), tostring(var.site_config.ip_restriction.action)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.ip_restriction_action", local.metadata.validator_error_messages["default"])
-}
 
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.ip_restriction_ip_address", local.metadata.validator_expressions["default"]), tostring(var.site_config.ip_restriction.ip_address)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.ip_restriction_ip_address", local.metadata.validator_error_messages["default"])
-}
 
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_ip_restriction_action", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_ip_restriction.action)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_ip_restriction_action", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.ip_restriction_action", local.metadata.validator_expressions["default"]), tostring(var.site_config.ip_restriction.action)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.ip_restriction_action", local.metadata.validator_error_messages["default"])
+  }
 
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_ip_restriction_ip_address", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_ip_restriction.ip_address)))
-  error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_ip_restriction_ip_address", local.metadata.validator_error_messages["default"])
-}
- 
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.ip_restriction_ip_address", local.metadata.validator_expressions["default"]), tostring(var.site_config.ip_restriction.ip_address)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.ip_restriction_ip_address", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_ip_restriction_action", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_ip_restriction.action)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_ip_restriction_action", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "site_config.scm_ip_restriction_ip_address", local.metadata.validator_expressions["default"]), tostring(var.site_config.scm_ip_restriction.ip_address)))
+    error_message = lookup(local.metadata.validator_error_messages, "site_config.scm_ip_restriction_ip_address", local.metadata.validator_error_messages["default"])
+  }
+
 }
 
 
@@ -512,29 +542,38 @@ variable "auth_settings" {
   EOT
   default     = null
 
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_enabled)))
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_enabled", local.metadata.validator_error_messages["default"])
-}
+ validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings.enabled)))
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_enabled", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_token_refresh_extension_hours", local.metadata.validator_expressions["default"]), tostring(var.auth_settings.token_refresh_extension_hours)))
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_token_refresh_extension_hours", local.metadata.validator_error_messages["default"])
+  }
+
+  validation {
+    condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_token_store_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings.token_store_enabled)))
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_token_store_enabled", local.metadata.validator_error_messages["default"])
+  }
 
 validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_token_refresh_extension_hours", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_token_refresh_extension_hours)))
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_token_refresh_extension_hours", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = can(regex(lookup(local.metadata.validator_expressions, "auth_settings_token_store_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings.token_store_enabled)))
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_token_store_enabled", local.metadata.validator_error_messages["default"])
-}
-
-validation {
-  condition     = contains(lookup(local.metadata.validator_values, "auth_settings_unauthenticated_client_action", ["RedirectToLoginPage", "AllowAnonymous"]), var.auth_settings.unauthenticated_client_action)
+  condition = try(
+    var.auth_settings == null ||
+    contains(
+      lookup(local.metadata.validator_expressions, "auth_settings_unauthenticated_client_action", ["RedirectToLoginPage", "AllowAnonymous"]),
+      var.auth_settings.unauthenticated_client_action
+    ),
+    true
+  )
   error_message = lookup(local.metadata.validator_error_messages, "auth_settings_unauthenticated_client_action", local.metadata.validator_error_messages["default"])
 }
+
 
 }
 
 variable "auth_settings_v2" {
+  default = null
   type = object({
     auth_enabled                            = optional(bool, false)
     runtime_version                         = optional(string, "~1")
@@ -716,30 +755,30 @@ variable "auth_settings_v2" {
   nonce_expiration_time             = The time after the request is made when the nonce should expire. Defaults to 00:05:00.
   EOT
 
-validation {
-  condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_auth_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.auth_enabled))), true)
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_auth_enabled", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_auth_enabled", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.auth_enabled))), true)
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_auth_enabled", local.metadata.validator_error_messages["default"])
+  }
 
-validation {
-  condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_require_authentication", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.require_authentication))), true)
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_require_authentication", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_require_authentication", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.require_authentication))), true)
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_require_authentication", local.metadata.validator_error_messages["default"])
+  }
 
-validation {
-  condition     = try(var.auth_settings_v2 == null || contains(lookup(local.metadata.validator_values, "auth_settings_v2_unauthenticated_action", ["RedirectToLoginPage", "AllowAnonymous", "Return401", "Return403"]), var.auth_settings_v2.unauthenticated_action)), true)
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_unauthenticated_action", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_unauthenticated_action", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.unauthenticated_action))), true)
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_unauthenticated_action", local.metadata.validator_error_messages["default"])
+  }
 
-validation {
-  condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_require_https", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.require_https))), true)
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_require_https", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_require_https", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.require_https))), true)
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_require_https", local.metadata.validator_error_messages["default"])
+  }
 
-validation {
-  condition     = try(var.auth_settings_v2 == null || contains(lookup(local.metadata.validator_values, "auth_settings_v2_forward_proxy_convention", ["NoProxy", "Standard", "Custom"]), var.auth_settings_v2.forward_proxy_convention)), true)
-  error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_forward_proxy_convention", local.metadata.validator_error_messages["default"])
-}
+  validation {
+    condition     = try(var.auth_settings_v2 == null || can(regex(lookup(local.metadata.validator_expressions, "auth_settings_v2_forward_proxy_convention", local.metadata.validator_expressions["default"]), tostring(var.auth_settings_v2.forward_proxy_convention))), true)
+    error_message = lookup(local.metadata.validator_error_messages, "auth_settings_v2_forward_proxy_convention", local.metadata.validator_error_messages["default"])
+  }
 
 }
 
@@ -893,7 +932,7 @@ variable "sticky_settings" {
 variable "web_app_slots" {
   type = list(object({
     name                                           = string
-    app_service_id                                 = string 
+    app_service_id                                 = string
     app_settings                                   = optional(map(string))
     client_affinity_enabled                        = optional(bool)
     client_certificate_enabled                     = optional(bool)
@@ -911,7 +950,6 @@ variable "web_app_slots" {
       api_definition_url                            = optional(string)
       api_management_api_id                         = optional(string)
       app_command_line                              = optional(string)
-      auto_heal_enabled                             = optional(bool)
       container_registry_managed_identity_client_id = optional(string)
       container_registry_use_managed_identity       = optional(bool)
       default_documents                             = optional(list(string))
@@ -1229,6 +1267,164 @@ variable "service_certificates" {
   default     = []
 }
 
+variable "app_settings" {
+  type        = map(string)
+  description = "A map of key-value pairs of App Settings."
+  default     = null
+}
+
+variable "client_affinity_enabled" {
+  type        = bool
+  description = "Should Client Affinity be enabled?"
+  default     = null
+
+  validation {
+    error_message = local.metadata.validator_error_messages.client_affinity_enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.client_affinity_enabled,
+        var.client_affinity_enabled
+      )
+    )
+  }
+}
+
+variable "client_certificate_enabled" {
+  type        = bool
+  description = "Should Client Certificates be enabled?"
+  default     = null
+
+  validation {
+    error_message = local.metadata.validator_error_messages.client_certificate_enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.client_certificate_enabled,
+        var.client_certificate_enabled
+      )
+    )
+  }
+}
+
+variable "client_certificate_mode" {
+  type        = string
+  description = "The Client Certificate mode."
+  default     = null
+
+  validation {
+    error_message = local.metadata.validator_error_messages.client_certificate_mode
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.client_certificate_mode,
+        var.client_certificate_mode
+      )
+    )
+  }
+}
+
+variable "client_certificate_exclusion_paths" {
+  type        = string
+  description = "Paths to exclude when using client certificates, separated by ;"
+  default     = null
+}
+
+variable "enabled" {
+  type        = bool
+  description = "Should the Linux Web App be enabled?"
+  default     = true
+
+  validation {
+    error_message = local.metadata.validator_error_messages.enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.enabled,
+        var.enabled
+      )
+    )
+  }
+}
+
+variable "ftp_publish_basic_authentication_enabled" {
+  type        = bool
+  description = "Should the default FTP Basic Authentication publishing profile be enabled."
+  default     = true
+
+  validation {
+    error_message = local.metadata.validator_error_messages.ftp_publish_basic_authentication_enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.ftp_publish_basic_authentication_enabled,
+        var.ftp_publish_basic_authentication_enabled
+      )
+    )
+  }
+}
+
+variable "https_only" {
+  type        = bool
+  description = "Should the Linux Web App require HTTPS connections?"
+  default     = null
+
+  validation {
+    error_message = local.metadata.validator_error_messages.https_only
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.https_only,
+        var.https_only
+      )
+    )
+  }
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  description = "Should public network access be enabled for the Web App?"
+  default     = true
+
+  validation {
+    error_message = local.metadata.validator_error_messages.public_network_access_enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.public_network_access_enabled,
+        var.public_network_access_enabled
+      )
+    )
+  }
+}
+
+variable "key_vault_reference_identity_id" {
+  type        = string
+  description = "The User Assigned Identity ID used for accessing KeyVault secrets."
+  default     = null
+}
+
+variable "virtual_network_subnet_id" {
+  type        = string
+  description = "The subnet ID which will be used by this Web App for regional virtual network integration."
+  default     = null
+}
+
+variable "webdeploy_publish_basic_authentication_enabled" {
+  type        = bool
+  description = "Should the default WebDeploy Basic Authentication publishing credentials enabled?"
+  default     = true
+
+  validation {
+    error_message = local.metadata.validator_error_messages.webdeploy_publish_basic_authentication_enabled
+    condition = can(
+      regex(
+        local.metadata.validator_expressions.webdeploy_publish_basic_authentication_enabled,
+        var.webdeploy_publish_basic_authentication_enabled
+      )
+    )
+  }
+}
+
+variable "zip_deploy_file" {
+  type        = string
+  description = "The local path and filename of the Zip packaged application to deploy to this Linux Web App."
+  default     = null
+}
+
 variable "custom_domains" {
   type = list(object({
     hostname         = string
@@ -1255,4 +1451,71 @@ variable "additional_tags" {
   type        = map(string)
   description = "User-defined tags to associate with the resource."
   default     = {}
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  description = <<EOT
+  The resource allows configurable timeouts for `create`, `read`, `update` and `delete` operations.
+
+  create = Used when creating the resource. Defaults to 30 minutes.
+  read   = Used when retrieving the resource. Defaults to 5 minutes.
+  update = Used when updating the resource. Defaults to 30 minutes.
+  delete = Used when deleting the resource. Defaults to 30 minutes.
+  EOT
+  default = ({
+    create = "30m"
+    read   = "5m"
+    update = "30m"
+    delete = "30m"
+  })
+}
+
+variable "password_length" {
+  type        = number
+  description = "The password length."
+  default     = 16
+
+  validation {
+    condition     = var.password_length > 0 && floor(var.password_length) == var.password_length
+    error_message = "Err: The value must be a positive integer."
+  }
+}
+
+variable "password_min_lower" {
+  type        = number
+  description = "Minimum number of lowercase alphabet characters in the password."
+  default     = 4
+
+  validation {
+    condition     = var.password_min_lower > 0 && floor(var.password_min_lower) == var.password_min_lower
+    error_message = "Err: The value must be a positive integer."
+  }
+}
+
+variable "password_min_numeric" {
+  type        = number
+  description = "Minimum number of numeric characters in the password."
+  default     = 4
+
+  validation {
+    condition     = var.password_min_numeric > 0 && floor(var.password_min_numeric) == var.password_min_numeric
+    error_message = "Err: The value must be a positive integer."
+  }
+}
+
+variable "password_min_upper" {
+  type        = number
+  description = "Minimum number of uppercase alphabet characters in the password."
+  default     = 4
+
+  validation {
+    condition     = var.password_min_upper > 0 && floor(var.password_min_upper) == var.password_min_upper
+    error_message = "Err: The value must be a positive integer."
+  }
 }
