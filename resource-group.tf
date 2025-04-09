@@ -1,3 +1,3 @@
 data "azurerm_resource_group" "this" {
-  name = var.resource_group_name
+  name = "spudmin-rg-sc-dev"
 }
