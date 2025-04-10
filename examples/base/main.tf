@@ -1,10 +1,10 @@
 provider "azurerm" {
   features         {}
-  subscription_id = "f94f1d33-9165-4e89-9e03-ccd009434116"
+  subscription_id = "example-subscription-id"
 }
 
 data "azurerm_resource_group" "this" {
-  name = "spudmin-rg-sc-dev"
+  name = "example-rg"
 }
 
 resource "azurerm_service_plan" "example" {
