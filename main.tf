@@ -1,14 +1,6 @@
-/*
- * # wanted-cloud/terraform-module-template
- * 
- * This repository represents a template for a Terraform building block module as we think it should be done, so it's for sure opinionated but in our eyes simple and powerful. Feel free to use or contribute.
- */
-
-/*
- * Here is perfect place for you main resource which should be created by this module. Use "this" as name for the main resource and its dependencies.
- */
-
 resource "azurerm_service_plan" "this" {
+  count = var.create_service_plan ? 1 : 0
+
   name                       = var.name
   resource_group_name        = data.azurerm_resource_group.this.name
   location                   = var.location != "" ? var.location : data.azurerm_resource_group.this.location
@@ -17,15 +9,13 @@ resource "azurerm_service_plan" "this" {
   app_service_environment_id = var.app_service_environment_id
   tags                       = local.metadata.tags
 
-timeouts {
-  create = try(var.metadata.resource_timeouts["service_plan"].create, "30m")
-  read   = try(var.metadata.resource_timeouts["service_plan"].read, "5m")
-  update = try(var.metadata.resource_timeouts["service_plan"].update, "30m")
-  delete = try(var.metadata.resource_timeouts["service_plan"].delete, "30m")
+  timeouts {
+    create = try(var.metadata.resource_timeouts["service_plan"].create, "30m")
+    read   = try(var.metadata.resource_timeouts["service_plan"].read, "5m")
+    update = try(var.metadata.resource_timeouts["service_plan"].update, "30m")
+    delete = try(var.metadata.resource_timeouts["service_plan"].delete, "30m")
+  }
 }
-
-}
-
 
 resource "azurerm_app_service_certificate" "this" {
   for_each = { for certificate in var.service_certificates : certificate.name => certificate }
@@ -33,7 +23,7 @@ resource "azurerm_app_service_certificate" "this" {
   name                = each.key
   resource_group_name = data.azurerm_resource_group.this.name
   location            = data.azurerm_resource_group.this.location
-  app_service_plan_id = azurerm_service_plan.this.id
+  app_service_plan_id = var.service_plan_id != null ? var.service_plan_id : azurerm_service_plan.this["create"].id
   key_vault_secret_id = each.value.byoc ? null : each.value.key_vault_secret_id
   tags                = local.metadata.tags
 
@@ -58,7 +48,6 @@ resource "azurerm_app_service_custom_hostname_binding" "this" {
     delete = var.timeouts.delete
   }
 
-  # Ignore ssl_state and thumbprint since they are managed by azurerm_app_service_certificate_binding.
   lifecycle {
     ignore_changes = [
       ssl_state,
@@ -68,7 +57,7 @@ resource "azurerm_app_service_custom_hostname_binding" "this" {
 }
 
 resource "random_password" "this" {
-    for_each = { for certificate in var.service_certificates : certificate.name => certificate if certificate.password == null }
+  for_each = { for certificate in var.service_certificates : certificate.name => certificate if certificate.password == null }
 
   length      = var.password_length
   min_lower   = var.password_min_lower
