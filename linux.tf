@@ -1,5 +1,5 @@
-resource "azurerm_windows_web_app" "this" {
-  count = lower(var.os_type) == "windows" ? 1 : 0
+resource "azurerm_linux_web_app" "this" {
+  count = lower(var.os_type) == "linux" ? 1 : 0
 
   name                                           = var.name
   resource_group_name                            = data.azurerm_resource_group.this.name
@@ -48,19 +48,14 @@ resource "azurerm_windows_web_app" "this" {
       for_each = var.site_config.application_stack == null ? [] : [var.site_config.application_stack]
 
       content {
-        current_stack                = application_stack.value.current_stack
-        docker_image_name            = application_stack.value.docker_image_name
-        docker_registry_url          = application_stack.value.docker_registry_url
-        docker_registry_username     = application_stack.value.docker_registry_username
-        docker_registry_password     = application_stack.value.docker_registry_password
-        dotnet_version               = application_stack.value.dotnet_version
-        dotnet_core_version          = application_stack.value.dotnet_core_version
-        tomcat_version               = application_stack.value.tomcat_version
-        java_embedded_server_enabled = application_stack.value.java_embedded_server_enabled
-        java_version                 = application_stack.value.java_version
-        node_version                 = application_stack.value.node_version
-        php_version                  = application_stack.value.php_version
-        python                       = application_stack.value.python
+        docker_image_name        = application_stack.value.docker_image_name
+        docker_registry_url      = application_stack.value.docker_registry_url
+        docker_registry_username = application_stack.value.docker_registry_username
+        docker_registry_password = application_stack.value.docker_registry_password
+        dotnet_version           = application_stack.value.dotnet_version
+        java_version             = application_stack.value.java_version
+        node_version             = application_stack.value.node_version
+        php_version              = application_stack.value.php_version
       }
     }
 
@@ -74,15 +69,6 @@ resource "azurerm_windows_web_app" "this" {
           content {
             action_type                    = action.value.action_type
             minimum_process_execution_time = action.value.minimum_process_execution_time
-
-            dynamic "custom_action" {
-              for_each = action.value.custom_action == null ? [] : [action.value.custom_action]
-
-              content {
-                executable = custom_action.value.executable
-                parameters = custom_action.value.parameters
-              }
-            }
           }
         }
 
@@ -90,7 +76,6 @@ resource "azurerm_windows_web_app" "this" {
           for_each = auto_heal_setting.value.trigger == null ? null : [auto_heal_setting.value.trigger]
 
           content {
-            private_memory_kb = trigger.value.private_memory_kb
 
             dynamic "requests" {
               for_each = trigger.value.requests == null ? [] : trigger.value.requests
@@ -532,12 +517,12 @@ resource "azurerm_windows_web_app" "this" {
   lifecycle {
     precondition {
       condition     = var.site_config.application_stack.current_stack == null ? true : contains(["dotnet", "dotnetcore", "node", "python", "php", "java"], var.site_config.application_stack.current_stack)
-      error_message = "Err: The Application Stack for the Windows Web App must be dotnet, dotnetcore, node, python, php, or java."
+      error_message = "Err: The Application Stack for the Linux Web App must be dotnet, dotnetcore, node, python, php, or java."
     }
-    precondition {
-      condition     = var.site_config.application_stack.dotnet_version == null ? true : contains(["v2.0", "v3.0", "v4.0", "v5.0", "v6.0", "v7.0", "v8.0"], var.site_config.application_stack.dotnet_version)
-      error_message = "Err: The .NET version to use must be v2.0,v3.0, v4.0, v5.0, v6.0, v7.0 or v8.0."
-    }
+precondition {
+  condition     = var.site_config.application_stack.dotnet_version == null ? true : contains(["3.1", "5.0", "6.0", "7.0", "8.0", "9.0"], var.site_config.application_stack.dotnet_version)
+  error_message = "Err: The .NET version for Linux Web App must be 3.1, 5.0, 6.0, 7.0, 8.0 or 9.0."
+}
 
     precondition {
       condition     = var.site_config.application_stack.java_embedded_server_enabled == null ? true : can(regex("^([t][r][u][e]|[f][a][l][s][e])$", var.site_config.application_stack.java_embedded_server_enabled))
@@ -581,11 +566,11 @@ resource "azurerm_windows_web_app" "this" {
   }
 }
 
-resource "azurerm_windows_web_app_slot" "this" {
-  for_each = { for slot in var.web_app_slots : slot.name => slot if lower(var.os_type) == "windows" }
+resource "azurerm_linux_web_app_slot" "this" {
+  for_each = { for slot in var.web_app_slots : slot.name => slot if lower(var.os_type) == "linux" }
 
   name                                           = each.value.name
-  app_service_id                                 = azurerm_windows_web_app.this[0].id
+  app_service_id                                 = azurerm_linux_web_app.this[0].id
   app_settings                                   = each.value.app_settings
   client_affinity_enabled                        = each.value.client_affinity_enabled
   client_certificate_enabled                     = each.value.client_certificate_enabled
@@ -630,19 +615,14 @@ resource "azurerm_windows_web_app_slot" "this" {
       for_each = each.value.site_config.application_stack == null ? [] : [each.value.site_config.application_stack]
 
       content {
-        current_stack                = application_stack.value.current_stack
-        docker_image_name            = application_stack.value.docker_image_name
-        docker_registry_url          = application_stack.value.docker_registry_url
-        docker_registry_username     = application_stack.value.docker_registry_username
-        docker_registry_password     = application_stack.value.docker_registry_password
-        dotnet_version               = application_stack.value.dotnet_version
-        dotnet_core_version          = application_stack.value.dotnet_core_version
-        tomcat_version               = application_stack.value.tomcat_version
-        java_embedded_server_enabled = application_stack.value.java_embedded_server_enabled
-        java_version                 = application_stack.value.java_version
-        node_version                 = application_stack.value.node_version
-        php_version                  = application_stack.value.php_version
-        python                       = application_stack.value.python
+        docker_image_name        = application_stack.value.docker_image_name
+        docker_registry_url      = application_stack.value.docker_registry_url
+        docker_registry_username = application_stack.value.docker_registry_username
+        docker_registry_password = application_stack.value.docker_registry_password
+        dotnet_version           = application_stack.value.dotnet_version
+        java_version             = application_stack.value.java_version
+        node_version             = application_stack.value.node_version
+        php_version              = application_stack.value.php_version
       }
     }
 
@@ -663,7 +643,6 @@ resource "azurerm_windows_web_app_slot" "this" {
           for_each = auto_heal_setting.value.trigger == null ? null : [auto_heal_setting.value.trigger]
 
           content {
-            private_memory_kb = trigger.value.private_memory_kb
 
             dynamic "requests" {
               for_each = trigger.value.requests == null ? [] : trigger.value.requests
