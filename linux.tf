@@ -519,10 +519,10 @@ resource "azurerm_linux_web_app" "this" {
       condition     = var.site_config.application_stack.current_stack == null ? true : contains(["dotnet", "dotnetcore", "node", "python", "php", "java"], var.site_config.application_stack.current_stack)
       error_message = "Err: The Application Stack for the Linux Web App must be dotnet, dotnetcore, node, python, php, or java."
     }
-precondition {
-  condition     = var.site_config.application_stack.dotnet_version == null ? true : contains(["3.1", "5.0", "6.0", "7.0", "8.0", "9.0"], var.site_config.application_stack.dotnet_version)
-  error_message = "Err: The .NET version for Linux Web App must be 3.1, 5.0, 6.0, 7.0, 8.0 or 9.0."
-}
+    precondition {
+      condition     = var.site_config.application_stack.dotnet_version == null ? true : contains(["3.1", "5.0", "6.0", "7.0", "8.0", "9.0"], var.site_config.application_stack.dotnet_version)
+      error_message = "Err: The .NET version for Linux Web App must be 3.1, 5.0, 6.0, 7.0, 8.0 or 9.0."
+    }
 
     precondition {
       condition     = var.site_config.application_stack.java_embedded_server_enabled == null ? true : can(regex("^([t][r][u][e]|[f][a][l][s][e])$", var.site_config.application_stack.java_embedded_server_enabled))

@@ -1,6 +1,6 @@
 provider "azurerm" {
-  features         {}
-  subscription_id = "example-sub-id"
+  features {}
+  subscription_id = "example-subid"
 }
 
 data "azurerm_resource_group" "this" {
@@ -20,14 +20,14 @@ resource "azurerm_service_plan" "example-windows" {
 }
 
 module "windows_web_app" {
-  source                = "../.."
-  name                  = "example-webapp-windows"
-  location              = data.azurerm_resource_group.this.location
-  resource_group_name   = data.azurerm_resource_group.this.name
-  os_type               = "Windows"
-  sku_name              = "P1v2"
+  source              = "../.."
+  name                = "example-webapp-windows"
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
+  os_type             = "Windows"
+  sku_name            = "P1v2"
   create_service_plan = false
-    service_plan_id     = azurerm_service_plan.example-windows.id
+  service_plan_id     = azurerm_service_plan.example-windows.id
 
   app_settings = {}
 
@@ -88,14 +88,14 @@ resource "azurerm_service_plan" "example-linux" {
 }
 
 module "linux_web_app" {
-  source                = "../.."
-  name                  = "example-webapp"
-  location              = data.azurerm_resource_group.this.location
-  resource_group_name   = data.azurerm_resource_group.this.name
-  os_type               = "Linux"
-  sku_name              = "P1v2"
+  source              = "../.."
+  name                = "example-webapp"
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
+  os_type             = "Linux"
+  sku_name            = "P1v2"
   create_service_plan = false
-    service_plan_id     = azurerm_service_plan.example-linux.id
+  service_plan_id     = azurerm_service_plan.example-linux.id
 
   app_settings = {}
 
