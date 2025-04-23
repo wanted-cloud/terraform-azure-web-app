@@ -4,7 +4,7 @@ resource "azurerm_windows_web_app" "this" {
   name                                           = var.name
   resource_group_name                            = data.azurerm_resource_group.this.name
   location                                       = data.azurerm_resource_group.this.location
-  service_plan_id                                = var.service_plan_id != null ? var.service_plan_id : azurerm_service_plan.this[0].id
+  service_plan_id                                = var.service_plan_id
   client_affinity_enabled                        = var.client_affinity_enabled
   client_certificate_enabled                     = var.client_certificate_enabled
   client_certificate_mode                        = var.client_certificate_mode

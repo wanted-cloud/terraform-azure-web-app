@@ -1,21 +1,21 @@
-resource "azurerm_service_plan" "this" {
-  count = var.create_service_plan ? 1 : 0
+# resource "azurerm_service_plan" "this" {
+#   count = var.create_service_plan ? 1 : 0
 
-  name                       = var.name
-  resource_group_name        = data.azurerm_resource_group.this.name
-  location                   = var.location != "" ? var.location : data.azurerm_resource_group.this.location
-  os_type                    = var.os_type
-  sku_name                   = var.sku_name
-  app_service_environment_id = var.app_service_environment_id
-  tags                       = local.metadata.tags
+#   name                       = var.name
+#   resource_group_name        = data.azurerm_resource_group.this.name
+#   location                   = var.location != "" ? var.location : data.azurerm_resource_group.this.location
+#   os_type                    = var.os_type
+#   sku_name                   = var.sku_name
+#   app_service_environment_id = var.app_service_environment_id
+#   tags                       = local.metadata.tags
 
-  timeouts {
-    create = try(var.metadata.resource_timeouts["service_plan"].create, "30m")
-    read   = try(var.metadata.resource_timeouts["service_plan"].read, "5m")
-    update = try(var.metadata.resource_timeouts["service_plan"].update, "30m")
-    delete = try(var.metadata.resource_timeouts["service_plan"].delete, "30m")
-  }
-}
+#   timeouts {
+#     create = try(var.metadata.resource_timeouts["service_plan"].create, "30m")
+#     read   = try(var.metadata.resource_timeouts["service_plan"].read, "5m")
+#     update = try(var.metadata.resource_timeouts["service_plan"].update, "30m")
+#     delete = try(var.metadata.resource_timeouts["service_plan"].delete, "30m")
+#   }
+# }
 
 resource "azurerm_app_service_certificate" "this" {
   for_each = { for certificate in var.service_certificates : certificate.name => certificate }
@@ -23,7 +23,7 @@ resource "azurerm_app_service_certificate" "this" {
   name                = each.key
   resource_group_name = data.azurerm_resource_group.this.name
   location            = data.azurerm_resource_group.this.location
-  app_service_plan_id = var.service_plan_id != null ? var.service_plan_id : azurerm_service_plan.this["create"].id
+  app_service_plan_id = var.service_plan_id
   key_vault_secret_id = each.value.byoc ? null : each.value.key_vault_secret_id
   tags                = local.metadata.tags
 
